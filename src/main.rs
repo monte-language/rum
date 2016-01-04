@@ -1,5 +1,9 @@
 extern crate docopt;
 extern crate rustc_serialize;
+mod parser;
+
+use std::error::Error;
+use std::fs::File;
 
 use docopt::Docopt;
 
@@ -22,9 +26,16 @@ struct Args {
 }
 
 fn main() {
-    let args: Args = Docopt::new(USAGE)
+    let mut args: Args = Docopt::new(USAGE)
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
-    println!("{:?}", args);
+    let source = match File::open(&mut args.arg_file) {
+        Ok(r) => r,
+        // This will display if file doesn't exist, etc
+        Err(e) => panic!("{:}", e),
+    };
+
+    parser::parse_file(&source);
+
 }
