@@ -2,6 +2,8 @@ extern crate docopt;
 extern crate rustc_serialize;
 mod parser;
 
+use std::fs::File;
+
 use docopt::Docopt;
 
 
@@ -23,10 +25,10 @@ struct Args {
 }
 
 fn main() {
-    let mut args: Args = Docopt::new(USAGE)
+    let args: Args = Docopt::new(USAGE)
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
-    parser::parse_file(&mut args.arg_file);
-
+    parser::parse_file(&args.arg_file);
+    File::create(&args.flag_output).unwrap();
 }
