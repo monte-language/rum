@@ -2,25 +2,24 @@ extern crate docopt;
 extern crate rustc_serialize;
 mod parser;
 
-use std::error::Error;
-
 use docopt::Docopt;
 
 
 const USAGE: &'static str = "
 monstracite
 
-Usage: monstracite [--file=<file>]
+Usage: monstracite [<file>] [(-o <output> | --output <output>)]
        monstracite (-h | --help)
 
 Options:
-    -f <file>, --file=<file>   Monte AST input [default: stdin]
-    -h  --help  Show this information
+    -o --output <output>    File Path to output executable [default: a.out]
+    -h --help               Show this information
 ";
 
 #[derive(Debug, RustcDecodable)]
 struct Args {
-    flag_file: String,
+    flag_output: String,
+    arg_file: String,
 }
 
 fn main() {
@@ -28,6 +27,6 @@ fn main() {
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
-    parser::parse_file(&mut args.flag_file);
+    parser::parse_file(&mut args.arg_file);
 
 }

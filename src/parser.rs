@@ -28,7 +28,7 @@ impl<R: Read> Mast for BufMASTReader<R> {
 
 pub fn parse_file(source_path: &str) {
     let mut mast_reader = match source_path {
-        e@"stdin" => {
+        e@"" => {
             // Sadly, since stdin cannot be a File, dump stdin to a tmp file
             // then read it. It's lame...but oh well
             let path = Path::join(temp_dir().as_path(), "stdin_mast");
