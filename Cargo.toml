@@ -5,4 +5,5 @@ authors = ["Justin Noah <justinnoah@gmail.com>"]
 
 [dependencies]
 docopt = "0.6.*"
+num = "0.1.*"
 rustc-serialize = "0.3.*"

@@ -1,4 +1,5 @@
 extern crate docopt;
+extern crate num;
 extern crate rustc_serialize;
 mod parser;
 
