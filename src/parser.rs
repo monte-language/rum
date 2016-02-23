@@ -12,7 +12,8 @@ use num::traits::{FromPrimitive, ToPrimitive};
 
 type BufMASTReader<R> = BufReader<R>;
 
-const MAGIC: &'static [u8; 10] = b"Mont\xe0MAST\x00";
+const MAGIC: &'static [u8; 9] = b"Mont\xe0MAST";
+const MAGIC_V: &'static [u8; 1] = b"\x00";
 
 fn unpack_float(bytes: Vec<u8>, endian: bool) -> f64 {
     panic!("{:?}, {:?}\nNot yet implemented!", bytes, endian);
@@ -35,10 +36,13 @@ impl<R: Read> Mast for BufMASTReader<R> {
     fn check_magic_numbers(&mut self) -> Result<(), &str> {
         let mut nums = [0u8; 10];
         self.take(10).read(&mut nums).unwrap();
-        for i in 0..10 {
+        for i in 0..9 {
             if nums[i] != MAGIC[i] {
                 return Err("Filetype is not Monte AST")
             }
+        }
+        if nums[9] != MAGIC_V[0] {
+            return Err("Wrong Monte AST version")
         }
         Ok(())
     }
