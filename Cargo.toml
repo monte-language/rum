@@ -1,9 +1,9 @@
 [package]
-name = "monstrosite"
+name = "rum"
 version = "0.1.0"
 authors = ["Justin Noah <justinnoah@gmail.com>"]
 
 [dependencies]
-docopt = "0.6.*"
-num = "0.1.*"
-rustc-serialize = "0.3.*"
+docopt = "0.6.78"
+num = "0.1.31"
+rustc-serialize = "0.3.18"

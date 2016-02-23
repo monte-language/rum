@@ -9,10 +9,10 @@ use docopt::Docopt;
 
 
 const USAGE: &'static str = "
-monstracite
+rum
 
-Usage: monstracite [<file>] [(-o <output> | --output <output>)]
-       monstracite (-h | --help)
+Usage: rum [<file>] [(-o <output> | --output <output>)]
+       rum (-h | --help)
 
 Options:
     -o --output <output>    File Path to output executable [default: a.out]
