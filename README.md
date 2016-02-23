@@ -1,7 +1,11 @@
-monstrosite
-===========
+rum
+===
 
-Transforms Monte AST into LLVM AST and produces a binary.
+A monte interpreter.
+
+Way down the road:
+- Transform Monte AST into LLVM AST to produce a binary.
+
 
 TODO
 ----
