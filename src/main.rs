@@ -11,25 +11,25 @@ use docopt::Docopt;
 const USAGE: &'static str = "
 rum
 
-Usage: rum [<file>] [(-o <output> | --output <output>)]
+Usage: rum [<file>]
        rum (-h | --help)
 
 Options:
-    -o --output <output>    File Path to output executable [default: a.out]
-    -h --help               Show this information
+    <file>      Optional: Input Mast File,
+                else read from stdin
+    -h --help   Show this information
 ";
 
 #[derive(Debug, RustcDecodable)]
 struct Args {
-    flag_output: String,
     arg_file: String,
 }
 
+// Appropriately handle the given arguments and begin parsing
 fn main() {
     let args: Args = Docopt::new(USAGE)
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
     parser::parse_file(&args.arg_file);
-    File::create(&args.flag_output).unwrap();
 }
