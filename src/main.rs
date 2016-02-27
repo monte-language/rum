@@ -4,8 +4,11 @@ extern crate rustc_serialize;
 mod parser;
 
 use std::fs::File;
+use std::io::prelude::*;
+use std::io::{self, BufReader};
 
 use docopt::Docopt;
+use parser::MastReader;
 
 
 const USAGE: &'static str = "
@@ -31,5 +34,20 @@ fn main() {
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
-    parser::parse_file(&args.arg_file);
+    let mut mast_reader = match &args.arg_file as &str {
+        "" => {
+            let b: Box<Read> = Box::new(io::stdin());
+            let a = BufReader::new(b);
+            a
+        },
+        p@_ => {
+            let b: Box<Read> = Box::new(File::open(&p).unwrap());
+            let a = BufReader::new(b);
+            a
+        },
+    };
+
+    // let mast_reader = BufReader::new(&args.arg_file);
+    mast_reader.check_magic_numbers().unwrap();
+    mast_reader.execute();
 }

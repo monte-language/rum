@@ -1,16 +1,10 @@
+use std::io::BufReader;
 use std::io::prelude::*;
-
-use std::env::temp_dir;
-use std::fs::File;
-use std::io::{self, BufReader};
-use std::path::Path;
 
 use num::Zero;
 use num::bigint::{BigInt, BigUint, ToBigInt};
 use num::traits::{FromPrimitive, ToPrimitive};
 
-
-type BufMASTReader<R> = BufReader<R>;
 
 const MAGIC: &'static [u8; 9] = b"Mont\xe0MAST";
 const MAGIC_V: &'static [u8; 1] = b"\x00";
@@ -21,7 +15,7 @@ fn unpack_float(bytes: Vec<u8>, endian: bool) -> f64 {
 }
 
 
-trait Mast {
+pub trait MastReader {
     fn check_magic_numbers(&mut self) -> Result<(), &str>;
     fn take_n_bytes(&mut self, n: usize) -> Vec<u8>;
     fn next_byte(&mut self) -> u8;
@@ -30,9 +24,10 @@ trait Mast {
     fn next_varint(&mut self) -> BigInt;
     fn next_int(&mut self) -> u64;
     fn next_str(&mut self) -> String;
+    fn execute(&mut self) -> u64;
 }
 
-impl<R: Read> Mast for BufMASTReader<R> {
+impl<R: Read> MastReader for BufReader<R> {
     fn check_magic_numbers(&mut self) -> Result<(), &str> {
         let mut nums = [0u8; 10];
         self.take(10).read(&mut nums).unwrap();
@@ -108,27 +103,8 @@ impl<R: Read> Mast for BufMASTReader<R> {
             }
         }
     }
-}
 
-pub fn parse_file(source_path: &str) {
-    let mut mast_reader = match source_path {
-        "" => {
-            // Sadly, since stdin cannot be a File, dump stdin to a tmp file
-            // then read it. It's lame...I hate this hack.
-            // TODO: Fix this
-            let path = Path::join(temp_dir().as_path(), "stdin_mast");
-            let mut tmp_file = File::create(path).unwrap();
-            let mut buf = Vec::new();
-            io::stdin().read_to_end(&mut buf).unwrap();
-            tmp_file.write_all(&mut buf).unwrap();
-            let path = Path::join(temp_dir().as_path(), "stdin_mast");
-            BufMASTReader::new(File::open(&path).unwrap())
-        },
-        f@_ => BufMASTReader::new(File::open(&f).unwrap()),
-    };
-
-    match mast_reader.check_magic_numbers() {
-        Err(e) => println!("{:}", e),
-        Ok(_) => println!("MAST Found"),
+    fn execute(&mut self) -> u64 {
+        5u64
     }
 }
