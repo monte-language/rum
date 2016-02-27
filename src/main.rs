@@ -1,14 +1,14 @@
 extern crate docopt;
 extern crate num;
 extern crate rustc_serialize;
-mod parser;
+mod mast;
 
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 
 use docopt::Docopt;
-use parser::MastReader;
+use mast::MastReader;
 
 
 const USAGE: &'static str = "
@@ -36,14 +36,14 @@ fn main() {
 
     let mut mast_reader = match &args.arg_file as &str {
         "" => {
-            let b: Box<Read> = Box::new(io::stdin());
-            let a = BufReader::new(b);
-            a
+            BufReader::new(
+                Box::new(io::stdin()) as Box<Read>
+            )
         },
         p@_ => {
-            let b: Box<Read> = Box::new(File::open(&p).unwrap());
-            let a = BufReader::new(b);
-            a
+            BufReader::new(
+                Box::new(File::open(&p).unwrap()) as Box<Read>
+            )
         },
     };
 
