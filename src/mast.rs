@@ -24,7 +24,7 @@ pub trait MastReader {
     fn next_varint(&mut self) -> BigInt;
     fn next_int(&mut self) -> u64;
     fn next_str(&mut self) -> String;
-    fn execute(&mut self) -> u64;
+    fn execute(&mut self);
 }
 
 impl<R: Read> MastReader for BufReader<R> {
@@ -104,7 +104,7 @@ impl<R: Read> MastReader for BufReader<R> {
         }
     }
 
-    fn execute(&mut self) -> u64 {
-        5u64
+    fn execute(&mut self) {
+        println!("Wait, I'm supposed to do a thing?")
     }
 }
