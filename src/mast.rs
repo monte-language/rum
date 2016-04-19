@@ -1,6 +1,7 @@
 use std::io::BufReader;
 use std::io::prelude::*;
 
+use bincode::rustc_serialize::decode;
 use num::Zero;
 use num::bigint::{BigInt, BigUint, ToBigInt};
 use num::traits::{FromPrimitive, ToPrimitive};
@@ -8,11 +9,6 @@ use num::traits::{FromPrimitive, ToPrimitive};
 
 const MAGIC: &'static [u8; 9] = b"Mont\xe0MAST";
 const MAGIC_V: &'static [u8; 1] = b"\x00";
-
-fn unpack_float(bytes: Vec<u8>, endian: bool) -> f64 {
-    panic!("{:?}, {:?}\nNot yet implemented!", bytes, endian);
-    // 0.0 as f64
-}
 
 
 pub trait MastReader {
@@ -61,7 +57,11 @@ impl<R: Read> MastReader for BufReader<R> {
 
     fn next_double(&mut self) -> f64 {
         let bytes = self.take_n_bytes(8);
-        unpack_float(bytes, true)
+        let d: Option<f64> = decode(&bytes).unwrap();
+        match d {
+            Some(dbl) => dbl,
+            None => panic!("The mast lies!")
+        }
     }
 
     fn next_varint(&mut self) -> BigInt {

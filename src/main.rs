@@ -1,3 +1,4 @@
+extern crate bincode;
 extern crate docopt;
 extern crate num;
 extern crate rustc_serialize;
