@@ -2,14 +2,14 @@ extern crate bincode;
 extern crate docopt;
 extern crate num;
 extern crate rustc_serialize;
-mod mast;
+mod load_mast;
 
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 
 use docopt::Docopt;
-use mast::MastReader;
+use load_mast::MastReader;
 
 
 const USAGE: &'static str = "
@@ -50,5 +50,4 @@ fn main() {
 
     // let mast_reader = BufReader::new(&args.arg_file);
     mast_reader.check_magic_numbers().unwrap();
-    mast_reader.execute();
 }
