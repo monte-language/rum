@@ -20,10 +20,9 @@ pub trait MastReader {
     fn next_varint(&mut self) -> BigInt;
     fn next_int(&mut self) -> u64;
     fn next_str(&mut self) -> String;
-    fn execute(&mut self);
 }
 
-impl<R: Read> MastReader for BufReader<R> {
+impl <R: Read> MastReader for BufReader<R> {
     fn check_magic_numbers(&mut self) -> Result<(), &str> {
         let mut nums = [0u8; 10];
         self.take(10).read(&mut nums).unwrap();
@@ -103,8 +102,105 @@ impl<R: Read> MastReader for BufReader<R> {
             }
         }
     }
+}
 
-    fn execute(&mut self) {
-        println!("Wait, I'm supposed to do a thing?")
+pub trait MastContext {
+    fn new(n: bool) -> Context;
+    fn decode_next_tag(&mut self, stream: &mut MastReader);
+}
+
+struct Context {
+    // Print fancy things about the MAST?
+    noisy: bool,
+}
+
+impl MastContext for Context {
+    fn new(n: bool) -> Context {
+        Context {
+            noisy: n,
+        }
+    }
+
+    fn decode_next_tag(&mut self, stream: &mut MastReader) {
+        let tag = stream.next_byte();
+        match tag {
+            b'L' => {
+                let literal_tag = stream.next_byte();
+                match literal_tag {
+                    b'C' => panic!("Literal '{:?}' not yet implemented!", literal_tag),
+                    b'D' => panic!("Literal '{:?}' not yet implemented!", literal_tag),
+                    b'I' => panic!("Literal '{:?}' not yet implemented!", literal_tag),
+                    b'N' => panic!("Literal '{:?}' not yet implemented!", literal_tag),
+                    b'S' => panic!("Literal '{:?}' not yet implemented!", literal_tag),
+                    _ => panic!("'{:?}' Unknown literal tag!", literal_tag),
+                }
+            },
+            b'P' => {
+                let pattern_tag = stream.next_byte();
+                match pattern_tag {
+                    b'F' => panic!("Pattern '{:?}' not yet implemented!", pattern_tag),
+                    b'I' => panic!("Pattern '{:?}' not yet implemented!", pattern_tag),
+                    b'V' => panic!("Pattern '{:?}' not yet implemented!", pattern_tag),
+                    b'L' => panic!("Pattern '{:?}' not yet implemented!", pattern_tag),
+                    b'A' => panic!("Pattern '{:?}' not yet implemented!", pattern_tag),
+                    b'B' => panic!("Pattern '{:?}' not yet implemented!", pattern_tag),
+                    _ => panic!("'{:?}' Unknown pattern tag!", pattern_tag),
+                }
+            },
+            b'N' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'B' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'S' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'C' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'D' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'e' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'E' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'O' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'M' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'R' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'A' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'F' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'Y' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'H' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'I' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'T' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            b'X' => {
+                panic!("{:?}' Not yet implemented!", tag);
+            },
+            _ => {
+                panic!("{:?}' Unknown Tag!", tag);
+            },
+        }
     }
 }
