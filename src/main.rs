@@ -9,7 +9,6 @@ use std::io::prelude::*;
 use std::io::{self, BufReader};
 
 use docopt::Docopt;
-use load_mast::MastReader;
 
 
 const USAGE: &'static str = "
@@ -35,17 +34,16 @@ fn main() {
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
-    let mut mast_reader = match &args.arg_file as &str {
+    let mast_reader = match &args.arg_file as &str {
         "" => {
-            BufReader::new(
-                Box::new(io::stdin()) as Box<Read>
-            )
+            let i = Box::new(io::stdin()) as Box<Read>;
+            Box::new(BufReader::new(i))
         },
         p@_ => {
-            BufReader::new(
-                Box::new(File::open(&p).unwrap()) as Box<Read>
-            )
+            let i = Box::new(File::open(&p).unwrap()) as Box<Read>;
+            Box::new(BufReader::new(i))
         },
     };
 
+    load_mast::load(mast_reader);
 }
