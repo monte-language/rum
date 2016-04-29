@@ -12,7 +12,7 @@ const MAGIC_V: &'static [u8; 1] = b"\x00";
 
 
 pub trait MastReader {
-    fn check_magic_numbers(&mut self) -> Result<(), &str>;
+    fn check_magic_numbers(&mut self) -> bool;
     fn take_n_bytes(&mut self, n: usize) -> Vec<u8>;
     fn next_byte(&mut self) -> u8;
     fn next_bytes(&mut self, count: usize) -> Vec<u8>;
@@ -23,18 +23,18 @@ pub trait MastReader {
 }
 
 impl <R: Read> MastReader for BufReader<R> {
-    fn check_magic_numbers(&mut self) -> Result<(), &str> {
+    fn check_magic_numbers(&mut self) -> bool {
         let mut nums = [0u8; 10];
         self.take(10).read(&mut nums).unwrap();
         for i in 0..9 {
             if nums[i] != MAGIC[i] {
-                return Err("Filetype is not Monte AST")
+                panic!("Filetype is not Monte AST")
             }
         }
         if nums[9] != MAGIC_V[0] {
-            return Err("Wrong Monte AST version")
+            panic!("Wrong Monte AST version")
         }
-        Ok(())
+        true
     }
 
     fn take_n_bytes(&mut self, n: usize) -> Vec<u8> {
@@ -48,7 +48,6 @@ impl <R: Read> MastReader for BufReader<R> {
     fn next_byte(&mut self) -> u8 {
         self.take_n_bytes(1).pop().unwrap()
     }
-
 
     fn next_bytes(&mut self, count: usize) -> Vec<u8> {
         self.take_n_bytes(count)

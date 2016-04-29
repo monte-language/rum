@@ -48,6 +48,4 @@ fn main() {
         },
     };
 
-    // let mast_reader = BufReader::new(&args.arg_file);
-    mast_reader.check_magic_numbers().unwrap();
 }
