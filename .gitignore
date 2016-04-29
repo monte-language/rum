@@ -22,3 +22,6 @@ a.out
 Session.vim
 .netrwhist
 *~
+
+### Project Specific ###
+*.mast
