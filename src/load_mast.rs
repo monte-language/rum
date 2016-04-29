@@ -6,6 +6,7 @@ use num::Zero;
 use num::bigint::{BigInt, BigUint, ToBigInt};
 use num::traits::{FromPrimitive, ToPrimitive};
 
+use nodes::*;
 
 const MAGIC: &'static [u8; 9] = b"Mont\xe0MAST";
 const MAGIC_V: &'static [u8; 1] = b"\x00";
@@ -117,6 +118,8 @@ pub struct Context {
     // Print fancy things about the MAST?
     noisy: bool,
     stream: Box<MastReader>,
+    expers: Box<Vec<Box<Expr>>>,
+    patts: Box<Vec<Box<FinalPattern>>>,
 }
 
 impl MastContext for Context {
@@ -124,6 +127,8 @@ impl MastContext for Context {
         Context {
             noisy: n,
             stream: stream as Box<MastReader>,
+            expers: Box::new(Vec::new()),
+            patts: Box::new(Vec::new()),
         }
     }
 
@@ -136,7 +141,11 @@ impl MastContext for Context {
                     b'C' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     b'D' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     b'I' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
-                    b'N' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
+                    b'N' => {
+                        let n = NullExpr;
+                        n.auditor_stamps();
+                        self.expers.push(Box::new(n));
+                    }
                     b'S' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     _ => panic!("'{}' Unknown literal tag!", literal_tag as char),
                 }

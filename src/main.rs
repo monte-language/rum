@@ -3,6 +3,7 @@ extern crate docopt;
 extern crate num;
 extern crate rustc_serialize;
 mod load_mast;
+mod nodes;
 
 use std::fs::File;
 use std::io::prelude::*;
