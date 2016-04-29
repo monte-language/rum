@@ -38,15 +38,20 @@ impl <R: Read> MastReader for BufReader<R> {
     }
 
     fn take_n_bytes(&mut self, n: usize) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(n);
-        let mut t = self.take(n.clone() as u64);
-        t.read(bytes.as_mut()).unwrap();
-        println!("Taking: {:?}", bytes);
+        println!("n: {:?}", n);
+        let mut bytes = Vec::new();
+        bytes.resize(n, 0);
+        let _ = self.read_exact(bytes.as_mut_slice());
+        let hex_out: String = bytes.iter().map(|b| format!("{}", *b as char)).collect();
+        println!("bytes: {}", hex_out);
         bytes
     }
 
     fn next_byte(&mut self) -> u8 {
-        self.take_n_bytes(1).pop().unwrap()
+        match self.take_n_bytes(1).pop() {
+            Some(x) => x,
+            None => panic!("Well shit, nothin there"),
+        }
     }
 
     fn next_bytes(&mut self, count: usize) -> Vec<u8> {
