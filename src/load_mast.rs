@@ -1,5 +1,6 @@
 use std::io::BufReader;
 use std::io::prelude::*;
+use std::sync::Arc;
 
 use bincode::rustc_serialize::decode;
 use num::Zero;
@@ -113,26 +114,31 @@ impl <R: Read> MastReader for BufReader<R> {
 }
 
 pub trait MastContext {
-    fn new(n: bool, stream: Box<BufReader<Box<Read>>>) -> Context;
+    fn expr_at(&mut self, idx: usize) -> Arc<Expr>;
+    fn new(n: bool, stream: Arc<BufReader<Box<Read>>>) -> Context;
     fn decode_next_tag(&mut self);
 }
 
 pub struct Context {
     // Print fancy things about the MAST?
     noisy: bool,
-    stream: Box<MastReader>,
-    expers: Box<Vec<Box<Expr>>>,
-    patts: Box<Vec<Box<FinalPattern>>>,
+    stream: Arc<MastReader>,
+    expers: Arc<Vec<Arc<Expr>>>,
+    patts: Arc<Vec<Arc<FinalPattern>>>,
 }
 
 impl MastContext for Context {
-    fn new(n: bool, stream: Box<BufReader<Box<Read>>>) -> Context {
+    fn new(n: bool, stream: Arc<BufReader<Box<Read>>>) -> Context {
         Context {
             noisy: n,
-            stream: stream as Box<MastReader>,
-            expers: Box::new(Vec::new()),
-            patts: Box::new(Vec::new()),
+            stream: stream as Arc<MastReader>,
+            expers: Arc::new(Vec::new()),
+            patts: Arc::new(Vec::new()),
         }
+    }
+
+    fn expr_at(&mut self, index: usize) -> Arc<Expr> {
+        self.expers[index].clone()
     }
 
     fn decode_next_tag(&mut self) {
@@ -154,14 +160,14 @@ impl MastContext for Context {
                         } else {
                             c = utf8.unwrap().pop().unwrap();
                         }
-                        self.expers.push(Box::new(CharExpr::new(c.clone())));
+                        self.expers.push(Arc::new(CharExpr::new(c.clone())));
                     },
                     b'D' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     b'I' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     b'N' => {
                         let n = NullExpr;
                         n.auditor_stamps();
-                        self.expers.push(Box::new(n));
+                        self.expers.push(Arc::new(n));
                     }
                     b'S' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     _ => panic!("'{}' Unknown literal tag!", literal_tag as char),
@@ -237,7 +243,7 @@ impl MastContext for Context {
     }
 }
 
-pub fn load(file: Box<BufReader<Box<Read>>>) {
+pub fn load(file: Arc<BufReader<Box<Read>>>) {
     let mut ctx = Context::new(true, file);
     match ctx.stream.check_magic_numbers() {
         true => {
