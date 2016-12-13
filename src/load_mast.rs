@@ -18,7 +18,7 @@ pub trait MastReader {
     fn next_byte(&mut self) -> u8;
     fn next_bytes(&mut self, count: usize) -> Vec<u8>;
     fn next_double(&mut self) -> f64;
-    fn next_varint(&mut self) -> BigInt;
+    fn next_varint(&mut self) -> Option<BigInt>;
     fn next_int(&mut self) -> u64;
     fn next_str(&mut self) -> String;
 }
@@ -68,7 +68,7 @@ impl <R: Read> MastReader for BufReader<R> {
         }
     }
 
-    fn next_varint(&mut self) -> BigInt {
+    fn next_varint(&mut self) -> Option<BigInt> {
         let mut shift: usize = 0;
         let mut bi: BigUint = BigUint::zero();
         let mut b: u8 = 0;
@@ -84,14 +84,17 @@ impl <R: Read> MastReader for BufReader<R> {
             }
         }
 
-        bi.to_bigint().unwrap()
+        bi.to_bigint()
     }
 
     // Might drop this, we'll see
     fn next_int(&mut self) -> u64 {
-        match self.next_varint().to_u64() {
-            None => panic!("String length overflows integer bounds"),
-            Some(x) => x
+        match self.next_varint() {
+            Some(bi) => match bi.to_u64() {
+                Some(x) => x,
+                None => panic!("String length overflows integer bounds")
+            },
+            None => panic!("Unable to parse integer.")
         }
     }
 
@@ -138,7 +141,21 @@ impl MastContext for Context {
             b'L' => {
                 let literal_tag = self.stream.next_byte();
                 match literal_tag {
-                    b'C' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
+                    b'C' => {
+                        let mut buf = vec![self.stream.next_byte()];
+                        let mut utf8 = String::from_utf8(buf.clone());
+                        let c: char;
+                        if utf8.is_err() {
+                            while utf8.unwrap_err().utf8_error().valid_up_to() == 0 {
+                                buf.push(self.stream.next_byte());
+                                utf8 = String::from_utf8(buf.clone());
+                            }
+                            c = String::from_utf8(buf.clone()).unwrap().pop().unwrap();
+                        } else {
+                            c = utf8.unwrap().pop().unwrap();
+                        }
+                        self.expers.push(Box::new(CharExpr::new(c.clone())));
+                    },
                     b'D' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     b'I' => panic!("Literal '{}' not yet implemented!", literal_tag as char),
                     b'N' => {
