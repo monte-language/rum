@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Justin Noah <justinnoah@gmail.com>"]
 
 [dependencies]
-bincode = "0.5.4"
-docopt = "0.6.78"
-num = "0.1.31"
-rustc-serialize = "0.3.18"
+bincode = "0.6"
+docopt = "0.6"
+num = "0.1"
+rustc-serialize = "0.3"
